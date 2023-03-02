@@ -1,0 +1,82 @@
+{
+	"sysmenu": {
+		"type": "dropdown",
+		"icon": "oi-key",
+		"name":"Rules",
+		"items":[
+			{
+				"url":"Acl_users_controller/list",
+				"name":"Acl_users_controller",
+				"type":"link"
+			},
+			{
+				"url":"Acl_roles_controller/list",
+				"name":"Acl_roles_controller",
+				"type":"link"
+			},
+			{
+				"url":"Acl_controllers_controller/list",
+				"name":"Acl_controllers_controller",
+				"type":"link"
+			}
+		]
+	},
+	"optionmenu":{
+		"type": "dropdown",
+		"icon": "oi-cog",
+		"name":"Options",
+		"items":[
+			{
+				"url":"Equipment_controller/list",
+				"name":"Equipment_controller",
+				"type":"link"
+			},	
+			{
+				"url":"Plan_controller/list",
+				"name":"Plan_controller",
+				"type":"link"
+			},			
+			{
+				"url":"Options_controller/list",
+				"name":"Option_controller",
+				"type":"link"
+			},
+			{
+				"type":"divider"
+			},
+			{
+				"url":"Parameters/edit",
+				"name":"Parameters",
+				"type":"link"
+			}
+		]
+	},
+	"topmenu":{
+		"type": "top",
+		"name": "topmenu",
+		"icon": "oi-key",		
+		"items":[
+			{
+				"url":"Km_controller/list",
+				"name":"Km_controller",
+				"icon":"oi-euro",
+				"type":"link",
+				"noright" : null
+			},
+			{
+				"url":"Work_controller/list",
+				"name":"Work_controller",
+				"icon":"oi-clipboard",
+				"type":"link",
+				"noright" : null
+			},
+			{
+				"url":"Reminder_controller/list",
+				"name":"Reminder_controller",
+				"icon":"oi-clock",
+				"type":"link",
+				"noright" : null
+			}			
+		]
+	}
+}

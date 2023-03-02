@@ -1,0 +1,68 @@
+{
+	"id": {
+		"type": "hidden",
+		"list": true,
+		"search": false,
+		"rules": null,
+		"since": 1,
+		"dbforge": {
+			"type": "INT",
+			"constraint": 11,
+			"unsigned": true,
+			"auto_increment": true
+		}
+	},
+	"name": {
+		"type": "input",
+		"list": true,
+		"search": true,
+		"rules": "trim|required|min_length[5]|max_length[255]",
+		"since": 1,
+		"dbforge": {
+			"type": "DATETIME"
+		}
+	},
+	"freq_time": {
+		"type": "input",
+		"list": true,
+		"search": true,
+		"rules": null,
+		"since": 1,
+		"dbforge": {
+			"type": "VARCHAR",
+			"constraint": "5"
+		}
+	},
+	"freq_km": {
+		"type": "input",
+		"list": true,
+		"search": true,
+		"rules": null,
+		"since": 1,
+		"dbforge": {
+			"type": "VARCHAR",
+			"constraint": "5"
+		}
+	},
+	"created": {
+		"type": "created",
+		"list": false,
+		"search": false,
+		"rules": null,
+		"since": 1,
+		"dbforge": {
+			"type": "DATETIME"
+		}
+	},
+	"updated": {
+		"type": "updated",
+		"sql":"ALTER TABLE `travaux` ADD `created` DATETIME NULL AFTER `accespar`, ADD `updated` DATETIME NULL AFTER `created`;",
+		"list": false,
+		"search": false,
+		"rules": null,
+		"since": 1,
+		"dbforge": {
+			"type": "DATETIME"
+		}
+	}						
+}
