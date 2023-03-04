@@ -2,11 +2,11 @@
 	<table class="table table-striped table-sm">
 	  <thead>
 		<tr>			
-			<th scope="col">&nbsp;</th>
+			<th scope="col" class="col-sm-2 col-md-1 col-xl-1">&nbsp;</th>
 			<?php
 			foreach($this->{$_model_name}->_get('defs') AS $field=>$defs){
 				if ($defs->list === true){
-					echo '<th scope="col">'.$this->render_object->render_link($field).'</a></th>';
+					echo '<th class="'.((isset($defs->class)) ? $defs->class:"").'" scope="col">'.$this->render_object->render_link($field).'</a></th>';
 				}
 			}
 			?>
@@ -17,13 +17,13 @@
 	<?php 
 	foreach($datas AS $key => $data){
 		echo '<tr>';
-		echo '<td>';
+		echo '<td class="col-sm-2 col-md-1 col-xl-1">';
 			echo $this->render_object->render_element_menu($data);
 		echo '</td>';	
 
 		foreach($this->{$_model_name}->_get('defs') AS $field=>$defs){
 			if ($defs->list === true){
-				echo '<td>'.$this->render_object->RenderElement($field, $data->{$field}).'</td>';
+				echo '<td class="'.((isset($defs->class)) ? $defs->class:"").'">'.$this->render_object->RenderElement($field, $data->{$field}).'</td>';
 			}
 		}
 		echo '</tr>';

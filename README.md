@@ -305,12 +305,3 @@ date time pour les traces
 ```
 
 ## Git Flow :
-
-develop est rattaché à l'environnement https://regio.dev-asso.fr
-main est rattaché à l'environnement https://mulhouse-travaux.abcmzwei.eu/
-
-branches de feature "feature-xxx" à partir de "develop" et faire une demande de merge c'est quand fini
-Ensuite, on met à jour l'environnement regio pour tester (git deploy sur le serveur )
-sur notre validation, on pousse en prod (git deploy sur le serveur)
-
-Pour les hotfix, branche de hotfix "hotfix-xxx" à partir de "main", et cherry pick sur main après validation sur la production.

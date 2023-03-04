@@ -40,32 +40,38 @@ class Work_controller extends MY_Controller {
 	public function edit($id = 0){
 		$this->_set('_redirect', FALSE);
 		parent::edit($id);
-		$type = $this->input->post('type');
-		if (is_array($type)){
-			foreach($type as $key=>$plan){
-				$this->Plan_model->_set('key_value',$plan);
-				$plan_detail  = $this->Plan_model->get_one();
-				//$this->Reminder_model->_set('_debug', TRUE);
-				$reminder = $this->Reminder_model->is_exist('','', ['id_work'=>$id,'id_plan'=>$plan]);
-				if (!$reminder){
 
-					$reminder = new StdClass();
-					$reminder->id_work = $id;
-					$reminder->id_plan = $plan;
-					$reminder->id_equ = $this->input->post('id_equ');
-					if ($this->input->post('km'))
-						$reminder->next_km = $this->input->post('km') + $plan_detail->freq_km ;
-					else 
-						$reminder->next_km = 0;
+		if ($this->form_validation->run($this->_model_name) === FALSE){
 
-					$reminder->next_date = (substr($this->input->post('date'),0,4)+$plan_detail->freq_time).substr($this->input->post('date'),4);
-					$reminder->object = 'prévu par travaux du '.$this->input->post('date');
+		} else {
+			$type = $this->input->post('type');
+			if (is_array($type)){
+				foreach($type as $key=>$plan){
+					$this->Plan_model->_set('key_value',$plan);
+					$plan_detail  = $this->Plan_model->get_one();
+					//$this->Reminder_model->_set('_debug', TRUE);
+					$reminder = $this->Reminder_model->is_exist('','', ['id_work'=>$id,'id_plan'=>$plan]);
+					if (!$reminder){
 
-					$this->Reminder_model->post($reminder);
+						$reminder = new StdClass();
+						$reminder->id_work = $id;
+						$reminder->id_plan = $plan;
+						$reminder->id_equ = $this->input->post('id_equ');
+						if ($this->input->post('km'))
+							$reminder->next_km = $this->input->post('km') + $plan_detail->freq_km ;
+						else 
+							$reminder->next_km = 0;
+
+						$reminder->next_date = (substr($this->input->post('date'),0,4)+$plan_detail->freq_time).substr($this->input->post('date'),4);
+						$reminder->object = 'prévu par travaux du '.$this->input->post('date');
+
+						$this->Reminder_model->post($reminder);
+					}
+
 				}
-
 			}
+			redirect($this->_get('_rules')[$this->next_view]->url);
 		}
-		//redirect($this->_get('_rules')[$this->next_view]->url);
 	}
+	
 }
