@@ -6,7 +6,7 @@ class Linksworksplans_model extends Core_model{
 	function __construct(){
 		parent::__construct();
 		
-		$this->_set('table'	, 'Linksworksplans');
+		$this->_set('table'	, 'linksworksplans');
 		$this->_set('key'	, 'id');
 		$this->_set('order'	, 'filter');
 		$this->_set('direction'	, 'desc');
