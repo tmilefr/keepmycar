@@ -13,6 +13,7 @@ class Home extends MY_Controller {
 		$this->load->library('Acl');
 		//$this->load->model('Acl_users_model');
 		$this->init();
+		$this->bootstrap_tools->_SetHead('assets/vendor/chart.js/Chart.js','js');
 	}
 
 	public function maintenance(){
@@ -26,8 +27,8 @@ class Home extends MY_Controller {
 		if($this->input->server('REQUEST_METHOD') == 'POST'){
 			if ($this->config->item('captcha')){
 				$captcha = json_decode($this->{$this->_model_name}->_get('defs')['recaptchaResponse']->PrepareForDBA($this->input->post("g-recaptcha-response")));
-			} else {
 				//echo '<pre>'.print_r($captcha, TRUE).'</pre>';
+			} else {
 				$captcha = new StdClass();
 				$captcha->success = true;
 			}
@@ -75,6 +76,32 @@ class Home extends MY_Controller {
 	public function index()
 	{
 		$this->_set('view_inprogress','unique/home_page');
+
+		$this->load->model('Km_model');
+		$this->render_object->Set_Rules_elements('Km_model'); //loading Linksworksplans_model ELements
+		$this->Km_model->_set('order','date');
+		$datas = $this->Km_model->get_all();
+
+		$stats =  [];
+		$stats['global']['eco'] = 0;
+		foreach($datas as $key=>$data){
+			$datas[$key]->before = ((isset($datas[$key+1])) ? $datas[$key+1]->km:0);
+
+			$datas[$key]->nb = (($data->before) ? ($data->km -  $data->before):0);
+			$datas[$key]->conso = $data->nb / $data->liter;
+			$datas[$key]->diff = ($data->liter * $data->sp98)-$data->billed;
+
+			$stats['dates'][] = $data->date;
+			$stats['line']['diff'][$data->date] = $data->diff;
+			//$stats['line']['km'][$data->date] = $data->nb;
+			$stats['line']['conso'][$data->date] = round($data->conso,2);
+			$stats['global']['eco'] += $data->diff;
+		}
+		$stats['color']['diff'] = '#0099ff';
+		$stats['color']['km'] = '#2682C4';		
+		$stats['color']['conso'] = '#AACE3A';	
+
+		$this->data_view['stats'] = $stats;
 		$this->render_view();
 	}
 
