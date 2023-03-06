@@ -79,25 +79,67 @@ class Home extends MY_Controller {
 
 		$this->load->model('Km_model');
 		$this->render_object->Set_Rules_elements('Km_model'); //loading Linksworksplans_model ELements
+
+		$this->load->model('Work_model');
+		$this->render_object->Set_Rules_elements('Work_model'); //loading Linksworksplans_model ELements
+
 		$this->Km_model->_set('order','date');
+		$this->Km_model->_set('direction','ASC');
 		$datas = $this->Km_model->get_all();
 
 		$stats =  [];
-		$stats['global']['eco'] = 0;
-		foreach($datas as $key=>$data){
-			$datas[$key]->before = ((isset($datas[$key+1])) ? $datas[$key+1]->km:0);
+		$stats['global']['eco'] 	= 0;
+		$stats['global']['km'] 		= 0;
+		$stats['global']['liter'] 	= 0;
+		$stats['global']['perday'] 	= 0;
+		$stats['global']['perkm'] 	= 0;
+		$stats['global']['billed'] 	= 0;
+		
 
-			$datas[$key]->nb = (($data->before) ? ($data->km -  $data->before):0);
-			$datas[$key]->conso = $data->nb / $data->liter;
-			$datas[$key]->diff = ($data->liter * $data->sp98)-$data->billed;
+		foreach($datas as $key=>$data){
+			$datas[$key]->nb 		= $data->km -  $data->km_prec;
+			$datas[$key]->conso 	= round($data->liter * 100 / $data->nb,2);
+			$datas[$key]->economie	= $data->liter * $data->sp98 - $data->billed;
+
+			if ($key == 0){
+				$stats['global']['conso_min'] = $data->conso;
+				$stats['global']['conso_max'] = $data->conso;
+			}
+			if ($data->conso < $stats['global']['conso_min'] )
+				$stats['global']['conso_min'] = $data->conso;
+			if ($data->conso > $stats['global']['conso_max'] )
+				$stats['global']['conso_max'] = $data->conso;
 
 			$stats['dates'][] = $data->date;
-			$stats['line']['diff'][$data->date] = $data->diff;
-			//$stats['line']['km'][$data->date] = $data->nb;
-			$stats['line']['conso'][$data->date] = round($data->conso,2);
-			$stats['global']['eco'] += $data->diff;
+			$stats['global']['km'] 		+= $data->nb; 
+			$stats['global']['liter'] 	+= $data->liter; 
+			$stats['global']['eco'] 	+= $data->economie;
+			$stats['global']['billed'] 	+= $data->billed; 
+			$stats['line']['economie'][$data->date] = $data->economie;
+			$stats['line']['conso'][$data->date] = $data->conso;
 		}
-		$stats['color']['diff'] = '#0099ff';
+		$stats['global']['conso_moy'] = round($stats['global']['liter'] * 100 / $stats['global']['km'],2);
+		
+		$this->Work_model->_set('order','id');
+		$datas = $this->Work_model->get_all();
+		$stats['global']['spend'] = 0;
+		foreach($datas AS $key=>$data){
+			if ($key == 0){
+				$max_km = $data->km;
+				$min_km = $data->km;
+			}
+			if($data->km > $max_km){
+				$max_km = $data->km;
+			}
+			if($data->km < $min_km){
+				$min_km = $data->km;
+			}		
+			$stats['global']['dist_km'] = $max_km - $min_km;
+			$stats['global']['spend'] += $data->billed;
+		}
+		$stats['global']['perkm'] = round($stats['global']['spend'] / $stats['global']['dist_km'],2);
+
+		$stats['color']['economie'] = '#0099ff';
 		$stats['color']['km'] = '#2682C4';		
 		$stats['color']['conso'] = '#AACE3A';	
 

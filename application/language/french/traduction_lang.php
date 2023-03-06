@@ -60,19 +60,30 @@ $lang['ADD_Reseller_controller'] = 'Ajouter';
 $lang['EDIT_Reseller_controller'] = 'Valider';
 $lang['LIST_Reseller_controller'] = 'Liste';
 
-$lang['Ru_controller'] = 'Ru';
-$lang['ADD_Ru_controller'] = 'Ajouter';
-$lang['EDIT_Ru_controller'] = 'Valider';
-$lang['LIST_Ru_controller'] = 'Liste';
+$lang['Km_controller'] = 'Pleins';
+$lang['ADD_Km_controller'] = 'Ajouter';
+$lang['EDIT_Km_controller'] = 'Valider';
+$lang['LIST_Km_controller'] = 'Liste';
 
-$lang['ADD_Order_controller'] = 'Ajouter';
-$lang['EDIT_Order_controller'] = 'Valider';
-$lang['LIST_Order_controller'] = 'Liste';
+$lang['Work_controller'] = 'Dépenses';
+$lang['ADD_Work_controller'] = 'Ajouter';
+$lang['EDIT_Work_controller'] = 'Valider';
+$lang['LIST_Work_controller'] = 'Liste';
+
+$lang['Reminder_controller'] = 'Agendas';
+$lang['ADD_Reminder_controller'] = 'Ajouter';
+$lang['EDIT_Reminder_controller'] = 'Valider';
+$lang['LIST_Reminder_controller'] = 'Liste';
+
+$lang['Equipment_controller'] = 'Véhicules';
+$lang['ADD_Equipment_controller'] = 'Ajouter';
+$lang['EDIT_Equipment_controller'] = 'Valider';
+$lang['LIST_Equipment_controller'] = 'Liste';
 
 
-$lang['Reseller_controller_edit'] = 'Edition d\'un fournisseur';
 
-
+$lang['Title_graph_economie'] = 'Economie sur plein brute';
+$lang['Title_graph_conso'] = 'Consomation';
 
 $lang['CNX_ME'] = 'Valider';
 

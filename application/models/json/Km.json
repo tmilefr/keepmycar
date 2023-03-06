@@ -41,10 +41,21 @@
 		"rules": null,
 		"since": 1,
 		"dbforge": {
-			"type": "VARCHAR",
+			"type": "integer",
 			"constraint": "255"
 		}
 	},
+	"km_prec": {
+		"type": "input",
+		"list": true,
+		"search": true,
+		"rules": null,
+		"since": 1,
+		"dbforge": {
+			"type": "integer",
+			"constraint": "255"
+		}
+	},	
 	"liter": {
 		"type": "input",
 		"list": false,
