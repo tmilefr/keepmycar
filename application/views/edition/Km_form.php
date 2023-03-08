@@ -12,19 +12,25 @@
 		</div>	
 		<div class="card-body">
 			<div class="form-row">
-				<div class="form-group col-md-4">
+				<div class="form-group col-md-3">
 					<?php 
 						echo $this->bootstrap_tools->label('date');
 						echo $this->render_object->RenderFormElement('date'); 
 					?>
 				</div>
-				<div class="form-group col-md-4">
+				<div class="form-group col-md-3">
 					<?php 
 						echo $this->bootstrap_tools->label('km');
 						echo $this->render_object->RenderFormElement('km');
 					?>
 				</div>	
-				<div class="form-group col-md-4">
+				<div class="form-group col-md-3">
+					<?php 
+						echo $this->bootstrap_tools->label('km_prec');
+						echo $this->render_object->RenderFormElement('km_prec');
+					?>
+				</div>					
+				<div class="form-group col-md-3">
 					<?php 
 						echo $this->bootstrap_tools->label('id_equ');
 						echo $this->render_object->RenderFormElement('id_equ');

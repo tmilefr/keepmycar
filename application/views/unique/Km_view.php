@@ -1,18 +1,17 @@
 <div class="container-fluid">
 	<div class="card">
 	  <div class="card-header">
-		<?php echo $this->render_object->RenderElement('date').' '.$this->render_object->RenderElement('km');?>
+		<?php echo $this->render_object->RenderElement('date').' '.$stats->km.' Km' ;?>
 	  </div>
 	  <div class="card-body">
 		<h5 class="card-title">
 			<?php echo $this->render_object->RenderElement('liter');?> L /
-			<?php echo $this->render_object->RenderElement('billed');?> €
+			<?php echo $this->render_object->RenderElement('billed');?> € / 
+			<?php echo $this->render_object->RenderElement('e85');?> € / L
 		</h5>
 		<p class="card-text">
 			<?php 
-				echo $this->bootstrap_tools->label('e85').' : '.$this->render_object->RenderElement('e85').'<br/>';
-				echo $this->bootstrap_tools->label('sp98').' : '.$this->render_object->RenderElement('sp98').'<br/>'; 
- 
+				echo $stats->conso.' L / 100'; 
 			?>
 		</p>
 		<?php

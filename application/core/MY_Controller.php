@@ -22,6 +22,7 @@ class MY_Controller extends CI_Controller {
 	protected $_rules				= null;
 	protected $_autorize			= array();
 	protected $_search  			= false;
+	protected $_dba_data				= null;
 	
 	protected $view_inprogress 		= null;
 	protected $data_view 			= array();
@@ -326,8 +327,8 @@ class MY_Controller extends CI_Controller {
 		if ($id){
 			$this->render_object->_set('id',		$id);
 			$this->{$this->_model_name}->_set('key_value',$id);
-			$dba_data = $this->{$this->_model_name}->get_one();
-			$this->render_object->_set('dba_data',$dba_data);
+			$this->_dba_data = $this->{$this->_model_name}->get_one();
+			$this->render_object->_set('dba_data',$this->_dba_data);
 		}	
 		$this->_set('view_inprogress',$this->_list_view);
 		if ($this->render_view)

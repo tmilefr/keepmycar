@@ -26,8 +26,26 @@ class Km_controller extends MY_Controller {
 		
 		$this->_set('_debug', FALSE);
 		$this->init();
-		
-		
 	}
+
+	/**
+	 * @brief Genric View Method
+	 * @param $id 
+	 * @returns 
+	 * 
+	 * 
+	 */
+	public function view($id){
+		$this->_set('render_view', FALSE);
+		parent::view($id);
+
+		$stats = new stdClass();
+		$stats->km = $this->_dba_data->km - $this->_dba_data->km_prec;
+		$stats->conso 	= round($this->_dba_data->liter * 100 / $stats->km,2);
+		$this->data_view['stats'] 	=  $stats;
+		$this->render_view();	
+	}
+
+
 
 }
