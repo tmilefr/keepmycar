@@ -4,12 +4,19 @@ if (! defined('BASEPATH'))
     exit('No direct script access allowed');
 //ALTER TABLE `users` ADD `role_id` INT(11) NOT NULL AFTER `created`;
 //GESTION DE la connection et de la sécurité du site
+
+$autoload = str_replace('application\\','',APPPATH).'vendor\\autoload.php';
+require_once($autoload);
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
 class Acl
 {
+
+    private $secretKey;
+
     protected $is_log = false;
     protected $CI;
-    protected $userId = NULL;
-    protected $userRoleId = NULL;
     protected $controller = NULL;
     protected $action = NULL;
     protected $permissions = [];
@@ -17,22 +24,17 @@ class Acl
         'home/logout',
         'home/login',
         'home/no_right',
-        'home/index',
-        'home/Myaccount',
-        'home/about',
         'home/maintenance',
-        'home'
+		'api/login',
+		'api/logout'
     ];
     protected $DontCheck    = FALSE;
     protected $_debug       = FALSE;
     protected $_debug_array = [];
     protected $usercheck    = NULL;
     protected $role_famille = 2;
+	//protected $ApiMode 		= FALSE;
 
-    protected $api = [
-        'base_url'  => 'https://delta-enfance3.fr/familleabcm/ABCMRegios68200/' , 
-        'user_agent' => "abcmschule"
-    ];
     
     /**
      * Constructor
@@ -46,7 +48,11 @@ class Acl
         $this->CI->load->helper('url');
         $this->CI->load->model('Acl_roles_model');
         $this->CI->load->model('Acl_users_model');
-        $this->CI->load->library('RestClient', $this->api);
+		$this->CI->config->load('secured');
+        //$this->CI->load->library('RestClient', $this->api);
+
+
+		$this->secretKey = API_KEY;
 
         $this->controller = strtolower($this->CI->uri->rsegment(1));
         $this->action     = strtolower($this->CI->uri->rsegment(2));
@@ -54,7 +60,6 @@ class Acl
 
         //un utilisateur est il connecté ? on centralise les appels à ses données.
         $this->usercheck = $this->CI->session->userdata('usercheck');
-
         if (!isset($this->usercheck->autorize)){ //initialisation de l'objet pour la sécurité
             $this->usercheck  = new StdClass();
             $this->usercheck->autorize =  false;
@@ -78,6 +83,44 @@ class Acl
      * 
      */
     public function IsLog(){
+        
+        $headers = getallheaders();
+        //token JWT pour les apis
+        if (isset($headers['Authorization']) && preg_match('/Bearer (.*)/', $headers['Authorization'], $matches)) {
+            $jwt = trim($matches[1]);
+            try{
+                $decoded = JWT::decode($jwt,  new Key($this->secretKey, 'HS256') ); 
+				//$this->ApiMode = true;
+                if (isset($decoded->data)){
+
+					if ($decoded->exp > time()){
+						$this->usercheck  = new StdClass();
+						$this->usercheck->autorize =  true;
+						$this->usercheck->type  = $decoded->data->type;
+						$this->usercheck->name = $decoded->data->name;
+						$this->usercheck->id = $decoded->data->id;    
+						$this->usercheck->role_id = $decoded->data->role_id;
+						$this->CI->session->set_userdata('usercheck', $this->usercheck); 
+						$this->permissions = $this->CI->Acl_roles_model->getRolePermissions();
+
+					} else {
+						http_response_code(401);					
+						echo json_encode(["message" => "Token Expired"]);
+						die;
+					}
+
+
+
+					if (!$this->hasAccess()){
+						http_response_code(403);
+						die;
+					}
+                }
+            } catch (Exception $e) {
+                http_response_code(401);
+                die;
+            }
+        }        
         $this->_debug_array[] =  $this->usercheck;
         if (  $this->usercheck->autorize === true ){
             return TRUE;
@@ -95,20 +138,18 @@ class Acl
      */
     public function hasAccess($currentPermission = null)
     {
-        //echo debug($this->permissions);
         if ($this->DontCheck)
             return TRUE;
-          
-        if ($this->IsLog() ){  
-            //tst de l'url par défaut si pas fournie
+        if (isset($this->usercheck->role_id)){  
+            //test de l'url par défaut si pas fournie
             if (!$currentPermission)
                 $currentPermission =  $this->controller . '/' . $this->action;
-
             //on regarde dans le tableau des droits ratatchés à l'utilisateur.
             if (isset($this->permissions[$this->getUserRoleId()]) && count($this->permissions[$this->getUserRoleId()]) > 0) {
                 if (in_array( strtolower($currentPermission) , $this->permissions[$this->getUserRoleId()])) {
                     return TRUE;
                 } else {
+					//echo $currentPermission.' NOT GRANTED'."<br/>";
                     $this->_debug_array[] = $currentPermission.' NOT GRANTED';
                 }
             }
@@ -147,8 +188,8 @@ class Acl
                 $this->_debug_array[] = $this->controller . '/' . $this->action.' GRANTED';
             }
         } else {
-            if ($this->controller . '/' . $this->action != 'home/login'){
-                return redirect('/Home/login');
+            if (!in_array($this->controller . '/' . $this->action, $this->CI->acl->getGuestPages()) && $this->controller . '/' . $this->action != 'Home/login'){
+                return redirect('Home/login');
             }
         }
     }
@@ -162,7 +203,7 @@ class Acl
      */
     public function CheckLogin($data){
         //Compte admin
-        $this->usercheck = $this->CI->Acl_users_model->verifyLogin($data['login'], $data['password']);
+        $this->usercheck = $this->CI->Acl_users_model->verifyLogin($data['login'], $data['password']);//? best way , realy ?
         $this->CI->session->set_userdata('usercheck', $this->usercheck); 
         //pas d'accès.
         if (!$this->usercheck->autorize){
@@ -178,7 +219,7 @@ class Acl
      * 
      */
     public function getType(){
-        if ($this->IsLog() ){
+        if (isset($this->usercheck->type)){
             return $this->usercheck->type;
         } else {
             return FALSE;
@@ -195,7 +236,7 @@ class Acl
      * 
      */
     public function GetUserName(){
-        if ($this->IsLog() ){
+        if (isset($this->usercheck->name)){
             return $this->usercheck->name;
         } else {
             return FALSE;
@@ -211,7 +252,7 @@ class Acl
      */
     public function getUserId()
     {
-        if ($this->IsLog())
+        if (isset($this->usercheck->id))
             return $this->usercheck->id;
         return false;
     }
@@ -223,7 +264,7 @@ class Acl
      */
     public function getUserRoleId()
     {
-        if ($this->IsLog())
+        if (isset($this->usercheck->role_id))
             return $this->usercheck->role_id;
         return false;
     }
