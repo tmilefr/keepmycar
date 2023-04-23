@@ -40,7 +40,8 @@
 		"search": false,
 		"rules": "trim|required",
 		"values": {
-			"typework": "typework"
+			"typework": "typework",
+			"type_fuel":"type fuel"
 		},
 		"since": 1,
 		"dbforge": {

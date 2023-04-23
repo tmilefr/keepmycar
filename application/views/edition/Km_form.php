@@ -63,6 +63,14 @@
 					?>
 				</div>
 			</div>
+			<div class="form-row">
+				<div class="form-group col-md-12">
+					<?php 
+						echo $this->bootstrap_tools->label('km_details');
+						echo $this->render_object->RenderFormElement('km_details'); 
+					?>
+				</div>
+			</div>
 			<div class="modal-footer">			
 				<button type="submit" class="btn btn-primary"><?php echo $this->render_object->_get('_ui_rules')[$this->render_object->_get('form_mod')]->name;?></button>
 			</div>

@@ -92,31 +92,23 @@ class Acl
                 $decoded = JWT::decode($jwt,  new Key($this->secretKey, 'HS256') ); 
 				//$this->ApiMode = true;
                 if (isset($decoded->data)){
-
-					if ($decoded->exp > time()){
-						$this->usercheck  = new StdClass();
-						$this->usercheck->autorize =  true;
-						$this->usercheck->type  = $decoded->data->type;
-						$this->usercheck->name = $decoded->data->name;
-						$this->usercheck->id = $decoded->data->id;    
-						$this->usercheck->role_id = $decoded->data->role_id;
-						$this->CI->session->set_userdata('usercheck', $this->usercheck); 
-						$this->permissions = $this->CI->Acl_roles_model->getRolePermissions();
-
-					} else {
-						http_response_code(401);					
-						echo json_encode(["message" => "Token Expired"]);
-						die;
-					}
-
-
+					$this->usercheck  = new StdClass();
+					$this->usercheck->autorize =  true;
+					$this->usercheck->type  = $decoded->data->type;
+					$this->usercheck->name = $decoded->data->name;
+					$this->usercheck->id = $decoded->data->id;    
+					$this->usercheck->role_id = $decoded->data->role_id;
+					$this->CI->session->set_userdata('usercheck', $this->usercheck); 
+					$this->permissions = $this->CI->Acl_roles_model->getRolePermissions();
 
 					if (!$this->hasAccess()){
+						echo json_encode(["message" => "Wrong Token"]);
 						http_response_code(403);
 						die;
 					}
                 }
             } catch (Exception $e) {
+				echo json_encode(["message" => $e->getMessage()]);
                 http_response_code(401);
                 die;
             }

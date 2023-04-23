@@ -24,6 +24,8 @@ class Km_controller extends MY_Controller {
 		
 		$this->title .= $this->lang->line('GESTION').$this->lang->line($this->_controller_name);
 		
+
+		$this->load->model('Km_details_model');
 		$this->_set('_debug', FALSE);
 		$this->init();
 	}

@@ -11,16 +11,22 @@ use Firebase\JWT\Key;
 class Api extends MY_Controller {
 
 	private $secretKey  = ''; //key from ACL
+	private $autorized_model  = ['km'=>'Km_model','detail'=>'Km_details_model','user'=>'Acl_users_model']; //model accessible en api
 
 	public function __construct(){
 		parent::__construct();
 		$this->secretKey = $this->acl->_get('secretKey');
 	}
 	
-	public function get($id = null){
-		$this->_model_name = 'Km_model';
+	public function get($_model_name = null ,$id = null){
+		if (!in_array($_model_name,array_keys($this->autorized_model))){
+			http_response_code(405);
+			echo json_encode(["message" => "Object Not Allowed"]);
+			die();
+		}
+		$this->_model_name = $this->autorized_model[$_model_name];
 		$this->load->model($this->_model_name);
-		$this->render_object->Set_Rules_elements('Km_model'); //loading Linksworksplans_model ELements
+		$this->render_object->Set_Rules_elements($this->_model_name); //loading Linksworksplans_model ELements
 
 		header("Content-Type: application/json");
 		switch($_SERVER['REQUEST_METHOD'])
@@ -32,16 +38,20 @@ class Api extends MY_Controller {
 				if ($id){
 					$this->{$this->_model_name}->_set('key_value',$id);
 					$dba_data = $this->{$this->_model_name}->get_one();
+					if (!$dba_data)
+						http_response_code(204);
 					echo json_encode($dba_data);
 				} else {
 					$datas = $this->{$this->_model_name}->get_all();
+					if (!count($datas))
+						http_response_code(204);
 					echo json_encode($datas);
 				}
 			break;
 			default:
 				// Requête invalide
-				header("HTTP/1.0 405 Method Not Allowed");
-				echo json_encode(["message" => "La méthode n'est pas autorisée"]);
+				http_response_code(405);
+				echo json_encode(["message" => "Method Not Allowed"]);
 				break;
 		}
 	}
@@ -127,9 +137,9 @@ class Api extends MY_Controller {
 			break;
 			default:
 				// Requête invalide
-				header("HTTP/1.0 405 Method Not Allowed");
-				echo json_encode(["message" => "La méthode n'est pas autorisée"]);
-				break;
+				http_response_code(405);
+				echo json_encode(["message" => "Method Not Allowed"]);
+			break;
 		}
 		//die();
 	}

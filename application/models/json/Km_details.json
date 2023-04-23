@@ -12,53 +12,21 @@
 			"auto_increment": true
 		}
 	},
-	"date": {
-		"type": "date",
-		"list": true,
-		"search": true,
-		"rules": "trim|required|min_length[5]|max_length[255]",
-		"since": 1,
-		"dbforge": {
-			"type": "DATETIME"
-		}
-	},
-	"id_equ": {
+	"id_km": {
 		"type": "select_database",
-		"list": true,
+		"list": false,
 		"search": true,
 		"rules": null,
 		"since": 1,
-		"param":"distinct(equipments,id:name@model)",
+		"param":"distinct(kms,id:km)",
 		"dbforge": {
 			"type": "VARCHAR",
 			"constraint": "255"
 		}
-	},	
-	"km": {
-		"type": "input",
-		"list": true,
-		"search": true,
-		"rules": null,
-		"since": 1,
-		"dbforge": {
-			"type": "integer",
-			"constraint": "255"
-		}
-	},
-	"km_prec": {
-		"type": "input",
-		"list": true,
-		"search": true,
-		"rules": null,
-		"since": 1,
-		"dbforge": {
-			"type": "integer",
-			"constraint": "255"
-		}
-	},	
+	},		
 	"liter": {
 		"type": "input",
-		"list": false,
+		"list": true,
 		"search": true,
 		"rules": "required",
 		"since": 1,
@@ -69,7 +37,7 @@
 	},
 	"billed": {
 		"type": "input",
-		"list": false,
+		"list": true,
 		"search": true,
 		"rules": "required",
 		"since": 1,
@@ -78,22 +46,12 @@
 			"constraint": "5"
 		}
 	},
-	"sp98": {
-		"type": "input",
-		"list": false,
+	"type_fuel": {
+		"type": "select_database",
+		"list": true,
 		"search": false,
 		"rules": "trim|required|min_length[3]",
-		"since": 1,
-		"dbforge": {
-			"type": "VARCHAR",
-			"constraint": "255"
-		}
-	},
-	"e85": {
-		"type": "input",
-		"list": false,
-		"search": false,
-		"rules": null,
+		"param":"distinct(options,cle:value#filter=type_fuel)",
 		"since": 1,
 		"dbforge": {
 			"type": "VARCHAR",
@@ -108,20 +66,6 @@
 		"since": 1,
 		"dbforge": {
 			"type": "DATETIME"
-		}
-	},
-	"km_details": {
-		"type": "table",
-		"model": "Km_details_model",
-		"ref":"billed",
-		"foreignkey":"id_km",		
-		"list": true,
-		"search": true,
-		"rules": null,
-		"since": 1,
-		"dbforge": {
-			"type": "VARCHAR",
-			"constraint": "255"
 		}
 	},
 	"updated": {
