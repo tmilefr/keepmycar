@@ -1,21 +1,16 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-$autoload = str_replace('application\\','',APPPATH).'vendor\\autoload.php';
-require_once($autoload);
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
+
 
 
 
 class Api extends MY_Controller {
 
-	private $secretKey  = ''; //key from ACL
-	private $autorized_model  = ['km'=>'Km_model','detail'=>'Km_details_model','user'=>'Acl_users_model']; //model accessible en api
+	private $autorized_model  = ['kms'=>'Km_model','detail'=>'Km_details_model','users'=>'Acl_users_model','roles'=>'Acl_roles_model']; //model accessible en api
 
 	public function __construct(){
 		parent::__construct();
-		$this->secretKey = $this->acl->_get('secretKey');
 	}
 	
 	public function get($_model_name = null ,$id = null){
@@ -27,6 +22,8 @@ class Api extends MY_Controller {
 		$this->_model_name = $this->autorized_model[$_model_name];
 		$this->load->model($this->_model_name);
 		$this->render_object->Set_Rules_elements($this->_model_name); //loading Linksworksplans_model ELements
+		$this->render_object->_set('_render_model','json');
+
 
 		header("Content-Type: application/json");
 		switch($_SERVER['REQUEST_METHOD'])
@@ -45,7 +42,21 @@ class Api extends MY_Controller {
 					$datas = $this->{$this->_model_name}->get_all();
 					if (!count($datas))
 						http_response_code(204);
-					echo json_encode($datas);
+					$response = new StdClass();
+					$response->raw = $datas;
+					$resp = [];
+					foreach($datas AS $key=>$data){
+						$res = [];
+						foreach($data AS $field=>$value){
+							$obj = new stdClass();
+							$obj->raw = $value;
+							$obj->render = $this->render_object->RenderElement($field,$value,$data->id, $this->_model_name );
+							$res[$field] = $obj;
+						}
+						$resp[$key] = $res;
+					}
+
+					echo json_encode($resp);
 				}
 			break;
 			default:
@@ -77,63 +88,37 @@ class Api extends MY_Controller {
 			header('Content-Type: text/plain');
 			die();
 		}
-	
 		header('Access-Control-Allow-Origin: *');
 		header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 		header('Access-Control-Allow-Headers: Content-Type, Authorization');
 		header('Access-Control-Allow-Credentials: true');
 		header("Content-Type: application/json");
-
 		switch($_SERVER['REQUEST_METHOD'])
 		{
 			case 'POST':
-
 				$input = json_decode(file_get_contents("php://input"));
-				//echo print_r($input);
-				if ($input->{'api-key'} == $this->secretKey){
-					$usercheck = $this->Acl_users_model->verifyLogin($input->login, $input->password);
+				$data = [];
+				$data['login'] = $input->login;
+				$data['password'] = $input->password;
+				$data['api-key'] = $input->{'api-key'};
 
-					if (!$usercheck->autorize){
-						http_response_code(401);
-						echo json_encode(["message" => "Auth failed"]);
-						die;
-					}
-
-					$issuer_claim = "KeepMyCar"; // this can be the servername
-					$audience_claim = "API access";
-					
-					$issuedat_claim = time(); // issued at
-					$notbefore_claim = $issuedat_claim + 1; //not before in seconds
-					$expire_claim = $issuedat_claim + 6000; // expire time in seconds
-					$token = array(
-					"iss" => $issuer_claim,
-					"aud" => $audience_claim,
-					"iat" => $issuedat_claim,
-					"nbf" => $notbefore_claim,
-					"exp" => $expire_claim,
-					"data" => $usercheck);
-	
-					http_response_code(200);
-	
-					$jwt = JWT::encode($token, $this->secretKey, 'HS256');
-
-					echo json_encode(
-					array(
-						"message" => "Successful login.",
-						"jwt" => $jwt,
-						"id" => $usercheck->id,
-						"role_id" => $usercheck->role_id,
-						"type" => $usercheck->type,
-						"expireAt" => $expire_claim
-					));
-					
-				} else {
-					http_response_code(401);
+				$usercheck = $this->acl->CheckLogin($data);
+				if (!$usercheck || !$usercheck->autorize){
+					http_response_code(403);
+					echo json_encode(["message" => "Auth failed"]);
 					die;
 				}
-			break;
-			case 'GET':
-
+				http_response_code(200);
+				echo json_encode(
+				array(
+					"message" => "Successful login.",
+					"jwt" => $usercheck->token,
+					"id" => $usercheck->id,
+					"role_id" => $usercheck->role_id,
+					"type" => $usercheck->type,
+					"expireAt" => $usercheck->expireAt,
+					"expireAtRender" => date('Y-m-d H:i:s', $usercheck->expireAt)
+				));
 			break;
 			default:
 				// Requête invalide

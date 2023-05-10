@@ -24,9 +24,12 @@ class element_table extends element
 		{
 			$this->CI->bootstrap_tools->_SetHead('assets/js/dynamic_row.js','js');
 		}
-		if ($this->model)
-			$this->CI->load->model($this->model);
+		$this->_load_model();
 	}	
+
+	private function _load_model(){
+		$this->CI->load->model($this->model);
+	}
 
 	public function AfterExec($datas){
 		$this->CI->{$this->model}->SetLink($this->foreignkey, $datas['id']);
@@ -117,25 +120,61 @@ class element_table extends element
 		return form_hidden($this->name , $this->value ).$table;
 
 	}
-	
-	public function Render(){
+
+	//TODO : pilote render mode ( json, html, raw ...)	
+	public function Render($format = false){
+		$this->_load_model();
 		$tmp = $this->value;
 		if($this->parent_id){
-			$this->CI->{$this->model}->_set('filter', [$this->foreignkey => $this->parent_id ]);
-			$this->CI->{$this->model}->_set('order', $this->foreignkey);
-			$datas = $this->CI->{$this->model}->get_all();
-			$dts = [];
-			foreach($datas AS $data){
-				foreach($this->CI->{$this->model}->_get('defs') AS $field=>$defs){
-					if ($field != 'id'){
-						$defs->_set('value', $data->{$field});
-						$dts[] = $defs->render();
+			if (isset($this->CI->{$this->model})){
+				$this->CI->{$this->model}->_set('filter', [$this->foreignkey => $this->parent_id ]);
+				$this->CI->{$this->model}->_set('order', $this->foreignkey);
+				$datas = $this->CI->{$this->model}->get_all();
+				
+				$dts = [];
+				foreach($datas AS $data){
+					$lgn = [];
+					foreach($this->CI->{$this->model}->_get('defs') AS $field=>$defs){
+							$obj = new StdClass();
+							$obj->raw = $data->{$field};
+							$defs->_set('value', $data->{$field});
+							$obj->render = $defs->render();
+							$lgn[$field] = $obj;
 					}
+					$dts[] = $lgn;
 				}
+
+				switch($format ){
+					case 'json':
+						return $dts;
+					break;
+					case 'raw':
+						foreach($dts AS $key=>$dt){
+							$tmp ='';
+							foreach($dt AS $field=>$obj){
+								$tmp .= $obj->render.";";
+							}
+							$dts[$key] = $tmp;
+						}
+						return implode("\n", $dts);
+					break;
+					default:
+						foreach($dts AS $key=>$dt){
+							$tmp ='';
+							foreach($dt AS $field=>$obj){
+								$tmp .= $obj->render.";";
+							}
+							$dts[$key] = $tmp;
+						}
+						return implode("<br/>", $dts);
+					break;
+				}	
+			} else {
+				return $this->model.' not instanciate';
 			}
-			$tmp = implode(' ,', $dts);
 		}
 		return $tmp;
+		
 	}
 
 	/**

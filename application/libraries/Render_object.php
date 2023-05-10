@@ -13,6 +13,7 @@ Class Render_object{
 	protected $notime	= TRUE;
 	protected $_reset   = [];
 	protected $_not_link_list = ['add','list'];
+	protected $_render_model = 'html';
 
 	public function __construct()
 	{
@@ -248,7 +249,7 @@ Class Render_object{
 		}
 		$this->_model[$DataModelToUse]->_get('defs')[$field]->_set('form_mod', $this->form_mod);	
 		$this->_model[$DataModelToUse]->_get('defs')[$field]->_set('value', $value);
-		return $this->_model[$DataModelToUse]->_get('defs')[$field]->Render();
+		return $this->_model[$DataModelToUse]->_get('defs')[$field]->Render($this->_render_model);
 	}
 	
 	function RenderImg($file, $alt = ""){
