@@ -25,11 +25,30 @@ class Km_controller extends MY_Controller {
 		$this->title .= $this->lang->line('GESTION').$this->lang->line($this->_controller_name);
 		
 
-		$this->load->model('Km_details_model');
+		$this->load->model('Km_details_model'); //TODO : Auto load.
 		$this->_set('_debug', FALSE);
 		$this->init();
 	}
 
+	/**
+	 * @brief Edition override Method
+	 * @param $id 
+	 * @returns 
+	 * 
+	 * 
+	 */
+	public function add(){
+		$this->_set('render_view', FALSE);
+
+		//recupération du dernier kilométrage saisi
+		$prec = $this->{$this->_model_name}->get_last();
+		$dba_data = new stdClass();
+		$dba_data->km_prec = $prec[0]->km_prec;
+		$this->render_object->_set('dba_data',$dba_data);
+
+		parent::add();
+		$this->render_view();	
+	}
 	/**
 	 * @brief Genric View Method
 	 * @param $id 

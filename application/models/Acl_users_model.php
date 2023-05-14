@@ -64,7 +64,7 @@ class Acl_users_model extends Core_model{
 				$usercheck->type  = "sys";
 
 				//echo debug($usercheck);
-			}
+			} 
 
 		}
 		return $usercheck;

@@ -194,14 +194,39 @@ class Acl
      * 
      */
     public function CheckLogin($data){
-        //Compte admin
-        $this->usercheck = $this->CI->Acl_users_model->verifyLogin($data['login'], $data['password']);//? best way , realy ?
-        $this->CI->session->set_userdata('usercheck', $this->usercheck); 
-        //pas d'accès.
-        if (!$this->usercheck->autorize){
-            return $this->CI->lang->line('WRONG_ACCES');
+        //si c'est un appel API
+        if (isset($data['api-key'] ) && $data['api-key'] != $this->secretKey ){
+            return false;
         }
+        $this->usercheck = $this->CI->Acl_users_model->verifyLogin($data['login'], $data['password']);
+        //MAKE JWT in case of use in front
+        if ($this->usercheck->autorize === TRUE ){
+            $issuer_claim = $this->__CLASS__; // this can be the servername
+            $audience_claim = "API access";
+            $issuedat_claim = time(); // issued at
+            $notbefore_claim = $issuedat_claim + 1; //not before in seconds
+            $expire_claim = $issuedat_claim + 6000; // expire time in seconds => todo in params
+            $token = array(
+                "iss" => $issuer_claim,
+                "aud" => $audience_claim,
+                "iat" => $issuedat_claim,
+                "nbf" => $notbefore_claim,
+                "exp" => $expire_claim,
+                "data" => $usercheck
+            );
+            $jwt = JWT::encode($token, $this->secretKey, 'HS256');
+            $this->usercheck->token = $jwt;
+            $this->usercheck->expireAt = $expire_claim;
+           
+
+            $this->CI->session->set_userdata('usercheck', $this->usercheck); 
+            return  $this->usercheck;
+        } else {
+            return $this->CI->lang->line('WRONG_ACCES');
+        }       
     }
+
+
 
     /**
      * Get Type

@@ -25,7 +25,7 @@ class Home extends MY_Controller {
 		$captcha_error = '';
 		$login_error = '';
 		if($this->input->server('REQUEST_METHOD') == 'POST'){
-			if ($this->config->item('captcha')){
+			if ($this->config->item('captcha')){ //TODO : mettre ça dans l'ACL
 				$captcha = json_decode($this->{$this->_model_name}->_get('defs')['recaptchaResponse']->PrepareForDBA($this->input->post("g-recaptcha-response")));
 				//echo '<pre>'.print_r($captcha, TRUE).'</pre>';
 			} else {

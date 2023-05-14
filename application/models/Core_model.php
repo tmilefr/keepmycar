@@ -78,7 +78,39 @@ class Core_model extends CI_Model {
 			//echo 'Exception reçue : ',  $e->getMessage(), "\n";
 		}
 	}	
+		
+	/**
+	 * Method DeleteLink
+	 *
+	 * @param $foreign_key $foreign_key [explicite description]
+	 * @param $id $id [explicite description]
+	 *
+	 * @return void
+	 */
+	function DeleteLink($foreign_key, $id = null){
+		if ($id){
+			$this->db->where_in($foreign_key, $id)
+				 ->delete($this->table); 
+		}
+	}
 	
+	/**
+	 * Method SetLink
+	 *
+	 * @param $foreign_key $foreign_key [explicite description]
+	 * @param $id $id [explicite description]
+	 *
+	 * @return void
+	 */
+	function SetLink($foreign_key, $id = null){
+		if ($id){
+			$this->db->set($foreign_key, $id);
+			$this->db->where($foreign_key, 99999);
+			$this->db->update($this->table);	
+			$this->_debug_array[] = $this->db->last_query();
+		}
+	}
+
 	/**
 	 * @brief 
 	 * @param $opt (std class) 
