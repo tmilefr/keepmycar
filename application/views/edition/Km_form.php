@@ -38,32 +38,6 @@
 				</div>							
 			</div>
 			<div class="form-row">
-				<div class="form-group col-md-3">
-					<?php 
-						echo $this->bootstrap_tools->label('liter');
-						echo $this->render_object->RenderFormElement('liter');
-					?>
-				</div>
-				<div class="form-group col-md-3">
-					<?php 
-						echo $this->bootstrap_tools->label('billed');
-						echo $this->render_object->RenderFormElement('billed'); 
-					?>
-				</div>
-				<div class="form-group col-md-3">
-					<?php 
-						echo $this->bootstrap_tools->label('sp98');
-						echo $this->render_object->RenderFormElement('sp98'); 
-					?>
-				</div>
-				<div class="form-group col-md-3">
-					<?php 
-						echo $this->bootstrap_tools->label('e85');
-						echo $this->render_object->RenderFormElement('e85'); 
-					?>
-				</div>
-			</div>
-			<div class="form-row">
 				<div class="form-group col-md-12">
 					<?php 
 						echo $this->bootstrap_tools->label('km_details');

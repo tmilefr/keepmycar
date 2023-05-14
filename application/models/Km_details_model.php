@@ -14,22 +14,6 @@ class Km_details_model extends Core_model{
 		$this->_set('json'	, 'Km_details.json');
 		$this->_init_def();
 	}
-
-	function DeleteLink($id_km = null){
-		if ($id_km){
-			$this->db->where_in('id_km', $id_km)
-				 ->delete($this->table);
-		}
-	}
-
-	function SetLink($id_km = null){
-		if ($id_km){
-			$this->db->set('id_km', $id_km);
-			$this->db->where('id_km', 0);
-			$this->db->update($this->table);	
-			$this->_debug_array[] = $this->db->last_query();
-		}
-	}
 }
 ?>
 

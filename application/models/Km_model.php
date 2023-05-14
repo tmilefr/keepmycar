@@ -15,6 +15,14 @@ class Km_model extends Core_model{
 		$this->_init_def();
 	}
 
+	function Stats(){
+
+	}
+
+	function get_last(){
+		return $this->query('SELECT km AS km_prec FROM `kms` ORDER BY km DESC LIMIT 1');
+	}
+
 }
 ?>
 
